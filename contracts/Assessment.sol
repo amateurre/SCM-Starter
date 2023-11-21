@@ -9,6 +9,7 @@ contract Assessment {
 
     event Deposit(uint256 amount);
     event Withdraw(uint256 amount);
+    event ItemPurchased(string item, uint256 price);
 
     constructor(uint initBalance) payable {
         owner = payable(msg.sender);
@@ -56,5 +57,27 @@ contract Assessment {
 
         // emit the event
         emit Withdraw(_withdrawAmount);
+    }
+
+    function buy(string memory _item) public {
+        require(msg.sender == owner, "You are not the owner of this account");
+
+        uint256 itemPrice;
+
+        if (keccak256(abi.encodePacked(_item)) == keccak256(abi.encodePacked("chicken"))) {
+            itemPrice = 20;
+        } else if (keccak256(abi.encodePacked(_item)) == keccak256(abi.encodePacked("beef"))) {
+            itemPrice = 40;
+        } else {
+            revert("Invalid item");
+        }
+
+        require(balance >= itemPrice, "Insufficient balance to buy the item");
+
+        // deduct the item price from the balance
+        balance -= itemPrice;
+
+        // emit the event
+        emit ItemPurchased(_item, itemPrice);
     }
 }
